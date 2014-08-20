@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content">
+	<RelativeLayout
+		android:id="@+id/rtvLayBle"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content">
+		<Button
+			android:id="@+id/btnSearch"
+			android:layout_width="wrap_content"
+			android:layout_height="40dp"
+			android:text="@string/txt_search">
+		</Button>
+
+		<Button
+			android:id="@+id/btnTest"
+			android:layout_width="wrap_content"
+			android:layout_height="40dp"
+			android:text="@string/txt_test"
+			android:layout_toRightOf="@id/btnSearch">
+		</Button>
+
+		<Switch
+			android:id="@+id/swService"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/txt_service_sw"
+			android:layout_below="@id/btnSearch"/>
+
+	</RelativeLayout>
+
+	<TextView
+		android:id="@+id/text"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@id/rtvLayBle"
+		/>
+	<ListView
+		android:id="@+id/list"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_below="@id/text"
+		/>
+</RelativeLayout>

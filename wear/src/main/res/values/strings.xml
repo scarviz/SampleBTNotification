@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">SampleBTNotification</string>
+    <string name="txt_search">Search</string>
+	<string name="txt_service_sw">Service</string>
+
+	<string name="txt_test">Test</string>
+</resources>

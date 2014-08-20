@@ -1,5 +1,7 @@
 package com.scarviz.samplebtnotification;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -7,6 +9,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -52,6 +55,9 @@ public class BTService extends Service {
 				e.printStackTrace();
 			}
 		}
+
+		// Service起動の通知を非表示にする
+		NotifyOff();
 	}
 
 	@Override
@@ -101,7 +107,40 @@ public class BTService extends Service {
 
 		mBtHelper.StartServer();
 
+		// BTServer起動後に通知表示するようにする
+		NotifyOn();
+
 		return null;
+	}
+
+	/**
+	 * Service起動の通知表示を表示する
+	 */
+	public void NotifyOn() {
+		Intent intent = new Intent(BTService.this, BTNotificationAct.class);
+		PendingIntent pendingIntent = PendingIntent.getActivity(BTService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+		NotificationCompat.Builder notification =	new NotificationCompat.Builder(this)
+				.setSmallIcon(R.drawable.ic_launcher)
+				.setContentTitle(getString(R.string.app_name))
+				.setContentText(getString(R.string.txt_sw_service))
+				.setAutoCancel(false)
+				.setWhen(System.currentTimeMillis())
+				.setContentIntent(pendingIntent);
+
+		NotificationManager manager = (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
+		manager.cancel(0);
+
+		// ServiceをKillされにくくする
+		startForeground(R.string.app_name, notification.build());
+	}
+
+	/**
+	 *  Service起動の通通知表示を非表示にする
+	 */
+	public void NotifyOff() {
+		NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		nm.cancel(R.string.app_name);
 	}
 
 	/**

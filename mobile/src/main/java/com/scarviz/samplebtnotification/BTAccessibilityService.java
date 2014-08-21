@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
@@ -22,7 +23,8 @@ public class BTAccessibilityService extends AccessibilityService
 {
 	private static BTAccessibilityService sSharedInstance;
 
-	private final String GM_PKG_NM = "com.google.android.gm";
+	/** GooglePlayストアのパッケージ名 */
+	private final String GPS_PKG_NM = "com.android.vending";
 
 	// AIDLによって接続されたクライアントのリスト
 	private final android.os.RemoteCallbackList<IBTAccessibilityServiceCallback> mCallbackList
@@ -56,9 +58,10 @@ public class BTAccessibilityService extends AccessibilityService
 			if (packageName.startsWith(ai.packageName)){
 				Log.d("onAccessibilityEvent", "ApplicationInfo.packageName:"+ai.packageName);
 				Log.d("onAccessibilityEvent", "ApplicationInfo.flags:"+ai.flags);
-				// GMailでなく、システム(プリインストール)のものの場合、無視する
-				if(!packageName.startsWith(GM_PKG_NM)
-					&& ((ai.flags & ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)){
+				// GooglePlayストアでなく、アップデート可能アプリでなく、システム(プリインストール)のものの場合、無視する
+				if(!packageName.startsWith(GPS_PKG_NM)
+					&& ((ai.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 0)
+					&& ((ai.flags & ApplicationInfo.FLAG_SYSTEM) != 0)){
 					continue;
 				}
 				// 一致する場合は確認済みとしてループから抜ける
@@ -84,14 +87,33 @@ public class BTAccessibilityService extends AccessibilityService
 		}
 
 		NotificationInfo notifyInfo = new NotificationInfo();
-		ImageView ivIcon = (ImageView) view.findViewById(android.R.id.icon);
-		TextView tvTitle = (TextView)view.findViewById(android.R.id.title);
 
-		if(ivIcon != null){
-			notifyInfo.Icon = ((BitmapDrawable) ivIcon.getDrawable()).getBitmap();
+		Drawable icon = null;
+		try {
+			// パッケージマネージャからアプリアイコンを取得する
+			icon = pm.getApplicationIcon(packageName);
+			if(icon == null) {
+				// Notificationレイアウトからアイコンを取得する
+				ImageView ivIcon = (ImageView) view.findViewById(android.R.id.icon);
+				if(ivIcon != null){
+					icon = ivIcon.getDrawable();
+				}
+			}
+		} catch (Exception e){
+			e.printStackTrace();
 		}
+
+		if(icon != null){
+			notifyInfo.Icon = ((BitmapDrawable) icon).getBitmap();
+		}
+
+		TextView tvTitle = (TextView)view.findViewById(android.R.id.title);
 		if(tvTitle != null) {
 			notifyInfo.Title = tvTitle.getText().toString();
+		}
+
+		if(notifyInfo.Title == null){
+			notifyInfo.Title = "no title";
 		}
 
 		StringBuilder sb = new StringBuilder();

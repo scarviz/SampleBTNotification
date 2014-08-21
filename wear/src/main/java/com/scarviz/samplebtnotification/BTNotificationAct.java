@@ -31,7 +31,7 @@ public class BTNotificationAct extends Activity {
 	private Button mBtnSearch, mBtnTest;
 	private TextView mTextView;
 	private ListView mBleList;
-	private Switch mSwService;
+	private Switch mSwService, mSwVibrator;
 
 	private BTService mBoundService;
 	private boolean mIsBound;
@@ -50,6 +50,7 @@ public class BTNotificationAct extends Activity {
 				mTextView = (TextView) stub.findViewById(R.id.text);
 				mBleList = (ListView) stub.findViewById(R.id.list);
 				mSwService = (Switch) stub.findViewById(R.id.swService);
+				mSwVibrator = (Switch) stub.findViewById(R.id.swVibrator);
 
 				mBtnSearch.setOnClickListener(new View.OnClickListener() {
 					@Override
@@ -114,6 +115,17 @@ public class BTNotificationAct extends Activity {
 					}
 				});
 
+				mSwVibrator.setChecked(true);
+				mSwVibrator.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+					@Override
+					public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+						if(mBoundService == null){
+							return;
+						}
+						mBoundService.SetEnableVibrator(isChecked);
+					}
+				});
+
 				StartService();
 				mHandler = new Handler();
 
@@ -159,6 +171,12 @@ public class BTNotificationAct extends Activity {
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			mBoundService = ((BTService.BTServicelBinder)service).getService();
+			if(mBoundService == null) {
+				mTextView.setText("Service Not Bound");
+				return;
+			}
+
+			mSwVibrator.setChecked(mBoundService.GetEnableVibrator());
 
 			if(!mIsDispedPaired){
 				SetPairedDevices();

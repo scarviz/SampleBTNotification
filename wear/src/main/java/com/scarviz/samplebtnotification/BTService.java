@@ -171,9 +171,11 @@ public class BTService extends Service {
 		((NotificationManager) getSystemService(NOTIFICATION_SERVICE))
 				.notify(GetNotifyId(), notification.build());
 
-		Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-		long[] pattern = {500, 1000};
-		vibrator.vibrate(pattern, -1);
+		if(mEnableVibrator) {
+			Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+			long[] pattern = {500, 1000};
+			vibrator.vibrate(pattern, -1);
+		}
 	}
 
 	private int mNotifyId = 0;
@@ -188,5 +190,21 @@ public class BTService extends Service {
 		}
 
 		return mNotifyId;
+	}
+
+	private boolean mEnableVibrator = true;
+	/**
+	 * バイブのEnableを設定する
+	 * @param enable
+	 */
+	public void SetEnableVibrator(boolean enable){
+		mEnableVibrator = enable;
+	}
+	/**
+	 * バイブのEnableを取得する
+	 * @return
+	 */
+	public boolean GetEnableVibrator(){
+		return  mEnableVibrator;
 	}
 }

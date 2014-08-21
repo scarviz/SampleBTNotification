@@ -30,6 +30,12 @@
 			android:text="@string/txt_service_sw"
 			android:layout_below="@id/btnSearch"/>
 
+		<Switch
+			android:id="@+id/swVibrator"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/txt_vibrator_sw"
+			android:layout_below="@id/swService"/>
 	</RelativeLayout>
 
 	<TextView

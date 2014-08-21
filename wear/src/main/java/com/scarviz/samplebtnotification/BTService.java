@@ -5,12 +5,15 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Vibrator;
+import android.text.format.Time;
 import android.util.Log;
 
 import java.lang.ref.WeakReference;
@@ -166,10 +169,24 @@ public class BTService extends Service {
 						.bigPicture(notifyInfo.Icon));
 
 		((NotificationManager) getSystemService(NOTIFICATION_SERVICE))
-				.notify(BT_NOTIFICATION_ID, notification.build());
+				.notify(GetNotifyId(), notification.build());
 
 		Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 		long[] pattern = {500, 1000};
 		vibrator.vibrate(pattern, -1);
+	}
+
+	private int mNotifyId = 0;
+	/**
+	 * Notification用のIDを取得する
+	 * @return
+	 */
+	private int GetNotifyId() {
+		mNotifyId++;
+		if(mNotifyId == Integer.MAX_VALUE){
+			mNotifyId = 0;
+		}
+
+		return mNotifyId;
 	}
 }

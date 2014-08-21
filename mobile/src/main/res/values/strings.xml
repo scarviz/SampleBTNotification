@@ -8,5 +8,6 @@
 	<string name="txt_start_server">Start server</string>
 	<string name="txt_accessibility_Service">AccessibilityService</string>
 	<string name="txt_sw_service">Service</string>
+	<string name="txt_test">Test</string>
 
 </resources>

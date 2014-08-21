@@ -1,6 +1,8 @@
 package com.scarviz.samplebtnotification;
 
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -8,6 +10,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,10 +23,12 @@ public class BTNotificationAct extends Activity {
 	private BTService mBoundService;
 	private boolean mIsBound;
 
+	private static final int TEST_NOTIFY_ID = Integer.MAX_VALUE;
+
 	private static final int REQUEST_DISCOVERABLE_BT = 2001;
 	private static final int DURATION = 300;
 
-	private Button mBtnDiscoverable, mBtnStartServer, mBtnAccessibilityService;
+	private Button mBtnDiscoverable, mBtnStartServer, mBtnAccessibilityService, mBtnTest;
 	private TextView mTxtText;
 	private Switch mSwService;
 
@@ -41,6 +46,7 @@ public class BTNotificationAct extends Activity {
 		mBtnAccessibilityService = (Button) findViewById(R.id.btnAccessibilityService);
 		mTxtText = (TextView) findViewById(R.id.txtText);
 		mSwService = (Switch) findViewById(R.id.swService);
+		mBtnTest = (Button) findViewById(R.id.btnTest);
 
 		mBtnDiscoverable.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -93,6 +99,13 @@ public class BTNotificationAct extends Activity {
 				} else {
 					StopService();
 				}
+			}
+		});
+
+		mBtnTest.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				NotifyTest();
 			}
 		});
 
@@ -184,4 +197,18 @@ public class BTNotificationAct extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+	/**
+	 * テスト用Notification
+	 */
+	private void NotifyTest(){
+		NotificationCompat.Builder notification =	new NotificationCompat.Builder(this)
+				.setSmallIcon(R.drawable.ic_launcher)
+				.setContentTitle(getString(R.string.txt_test))
+				.setContentText(getString(R.string.txt_test))
+				.setAutoCancel(true)
+				.setWhen(System.currentTimeMillis());
+
+		NotificationManager manager = (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);
+		manager.notify(TEST_NOTIFY_ID, notification.build());
+	}
 }

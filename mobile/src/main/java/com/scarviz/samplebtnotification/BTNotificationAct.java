@@ -2,6 +2,7 @@ package com.scarviz.samplebtnotification;
 
 import android.app.Activity;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
@@ -206,6 +207,8 @@ public class BTNotificationAct extends Activity {
 				.setContentTitle(getString(R.string.txt_test))
 				.setContentText(getString(R.string.txt_test))
 				.setAutoCancel(true)
+				// 空Intentでdismissさせるようにする
+				.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(), 0))
 				.setWhen(System.currentTimeMillis());
 
 		NotificationManager manager = (NotificationManager) getSystemService(Service.NOTIFICATION_SERVICE);

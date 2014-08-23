@@ -2,10 +2,10 @@ SampleBTNotification
 ====================
 Android4.0以上の端末(handheld)のNotification情報を、AndroidWearに通知するサンプルソースです。
 
-動作方法
+動作手順
 --------
 #### インストール
-サンプルソースから、端末とAndroidWearにそれぞれインストールする
+AndroidStudioでSampleBTNotificationを開き、端末とAndroidWearにそれぞれ実行する
 
 #### 端末(handheld)の設定
 1. Bluetoothを有効にする

@@ -117,6 +117,7 @@ public class BTAccessibilityService extends AccessibilityService
 		}
 
 		StringBuilder sb = new StringBuilder();
+		// event.getTextにはsetTickerで設定されている文字列が格納されている
 		for (CharSequence cs : event.getText()) {
 			// 既に文字列を格納済みの場合は改行コードを入れる
 			if(0 < sb.length()){

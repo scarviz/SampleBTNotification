@@ -17,10 +17,11 @@ ServiceのスイッチをONにする(デフォルトでONになっている)
 
 #### 端末とAndroidWearの接続
 1. 一度もペアリングを実施したことがない場合、端末のDiscoverableボタンを押下し、AndroidWearのSearchボタンを押下する
-2. 端末のStart serverボタンを押下する
-3. AndroidWearのリストから、端末を探し、その項目をタップする
-4. 端末とAndroidWearのそれぞれでペアリング許可を求められるので、許可する
-5. AndroidWearのTestボタンを押下し、端末側でToastが表示されていれば、接続成功
+2. AndroidWearのリストに、端末の情報が表示されているのを確認する
+3. 端末のStart serverボタンを押下する
+4. AndroidWearのリストで、端末情報の項目をタップする
+5. 端末とAndroidWearのそれぞれでペアリング許可を求められるので、許可する
+6. AndroidWearのTestボタンを押下し、端末側でToastが表示されていれば、接続成功
 
 #### Notificationの通知テスト
 1. 端末のTestボタンを押下する

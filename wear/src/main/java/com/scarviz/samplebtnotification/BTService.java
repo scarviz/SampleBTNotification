@@ -173,7 +173,7 @@ public class BTService extends Service {
 
 		if(mEnableVibrator) {
 			Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-			long[] pattern = {500, 1000};
+			long[] pattern = {500, 500};
 			vibrator.vibrate(pattern, -1);
 		}
 	}

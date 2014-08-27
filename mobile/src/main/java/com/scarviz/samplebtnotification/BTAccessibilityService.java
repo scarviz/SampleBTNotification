@@ -155,7 +155,7 @@ public class BTAccessibilityService extends AccessibilityService
 			// Serviceと接続
 			Intent intent = new Intent(this, BTService.class);
 			bindService(intent, mConnection, BIND_AUTO_CREATE);
-			Log.d("onAccessibilityEvent", "bind BTService");
+			Log.d("BindBTService", "bind BTService");
 		}
 	}
 
@@ -165,7 +165,7 @@ public class BTAccessibilityService extends AccessibilityService
 	private void UnbindBTService(){
 		if(mIsBound) {
 			unbindService(mConnection);
-			Log.d("onAccessibilityEvent", "unbind BTService");
+			Log.d("UnbindBTService", "unbind BTService");
 		}
 		mIsBound = false;
 	}
@@ -185,7 +185,7 @@ public class BTAccessibilityService extends AccessibilityService
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			mBoundBTService = ((BTService.BTServicelBinder)service).getService();
 			mIsBound = true;
-			Log.d("onAccessibilityEvent", "BTService Connected");
+			Log.d("onServiceConnected", "BTService Connected");
 		}
 	};
 
@@ -195,7 +195,7 @@ public class BTAccessibilityService extends AccessibilityService
 	 */
 	public void SendNotification(NotificationInfo notifyInfo) {
 		if(mBoundBTService == null){
-			Log.d("onAccessibilityEvent", "mBoundService is null");
+			Log.d("SendNotification", "mBoundService is null");
 			return;
 		}
 		mBoundBTService.SendNotification(notifyInfo.GetJsonStr(notifyInfo));

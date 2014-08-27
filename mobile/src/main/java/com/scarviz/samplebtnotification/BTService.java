@@ -8,7 +8,6 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -19,10 +18,6 @@ public class BTService extends Service {
 	private BtProcHandler mBtProcHandler;
 	private BluetoothHelper mBtHelper;
 	private final String UUID = "9dfda1d0-dc92-477b-b109-b731ecce2c21";
-
-	private IBTAccessibilityService mService;
-
-	private final static String ERR_MES_AS_NOT_BIND = "AccessibilityService Not Bind";
 
 	@Override
 	public void onCreate() {
@@ -47,14 +42,6 @@ public class BTService extends Service {
 	public void onDestroy() {
 		Log.d("BTService", "onDestroy");
 		mBtHelper.Cancel();
-		if (mService != null) {
-			try {
-				mService.unregisterCallback(mCallback);
-				mService = null;
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
-		}
 
 		// Service起動の通知を非表示にする
 		NotifyOff();
@@ -92,19 +79,6 @@ public class BTService extends Service {
 	 * @return エラーメッセージ
 	 */
 	public String StartServer() {
-		try {
-			IBinder binder = BTAccessibilityService.GetBinder();
-			if(binder == null){
-				return ERR_MES_AS_NOT_BIND;
-			}
-
-			mService = IBTAccessibilityService.Stub.asInterface(binder);
-			mService.registerCallback(mCallback);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ERR_MES_AS_NOT_BIND;
-		}
-
 		mBtHelper.StartServer();
 
 		// BTServer起動後に通知表示するようにする
@@ -114,9 +88,24 @@ public class BTService extends Service {
 	}
 
 	/**
+	 * Notificationを送る
+	 * @param notifyInfoJson
+	 */
+	public void SendNotification(String notifyInfoJson) {
+		if(mBtHelper == null || !mBtHelper.IsConnected()){
+			Log.d("BTService.SendNotification", "BlueTooth Not Connected");
+			return;
+		}
+
+		Log.d("BTService.SendNotification", notifyInfoJson);
+		//Toast.makeText(getApplicationContext(), notifyInfoJson, Toast.LENGTH_SHORT).show();
+		mBtHelper.sendMessage(notifyInfoJson);
+	}
+
+	/**
 	 * Service起動の通知表示を表示する
 	 */
-	public void NotifyOn() {
+	private void NotifyOn() {
 		Intent intent = new Intent(BTService.this, BTNotificationAct.class);
 		PendingIntent pendingIntent = PendingIntent.getActivity(BTService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -138,7 +127,7 @@ public class BTService extends Service {
 	/**
 	 *  Service起動の通通知表示を非表示にする
 	 */
-	public void NotifyOff() {
+	private void NotifyOff() {
 		NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		nm.cancel(R.string.app_name);
 	}
@@ -171,21 +160,4 @@ public class BTService extends Service {
 			}
 		}
 	}
-
-	/**
-	 * BTAccessibilityServiceのコールバック
-	 */
-	private IBTAccessibilityServiceCallback mCallback = new IBTAccessibilityServiceCallback.Stub() {
-		@Override
-		public void SendNotification(String notifyInfoJson) throws RemoteException {
-			if(!mBtHelper.IsConnected()){
-				Log.d("BTService.SendNotification", "BlueTooth Not Connected");
-				return;
-			}
-
-			Log.d("BTService.SendNotification", notifyInfoJson);
-			//Toast.makeText(getApplicationContext(), notifyInfoJson, Toast.LENGTH_SHORT).show();
-			mBtHelper.sendMessage(notifyInfoJson);
-		}
-	};
 }

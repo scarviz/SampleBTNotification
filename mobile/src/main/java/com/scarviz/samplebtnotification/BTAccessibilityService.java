@@ -2,6 +2,7 @@ package com.scarviz.samplebtnotification;
 
 import android.accessibilityservice.AccessibilityService;
 import android.app.Notification;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ApplicationInfo;
@@ -9,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
@@ -21,14 +21,11 @@ import java.util.List;
 
 public class BTAccessibilityService extends AccessibilityService
 {
-	private static BTAccessibilityService sSharedInstance;
+	private BTService mBoundBTService;
+	private boolean mIsBound;
 
 	/** GooglePlayストアのパッケージ名 */
 	private final String GPS_PKG_NM = "com.android.vending";
-
-	// AIDLによって接続されたクライアントのリスト
-	private final android.os.RemoteCallbackList<IBTAccessibilityServiceCallback> mCallbackList
-			= new android.os.RemoteCallbackList<IBTAccessibilityServiceCallback>();
 
 	@Override
 	public void onAccessibilityEvent(AccessibilityEvent event) {
@@ -74,6 +71,8 @@ public class BTAccessibilityService extends AccessibilityService
 		if(!existPkg){
 			return;
 		}
+
+		BindBTService();
 
 		Notification n = (Notification)event.getParcelableData();
 		if (n == null) {
@@ -139,70 +138,66 @@ public class BTAccessibilityService extends AccessibilityService
 
 	@Override
 	public void onInterrupt() {
+		UnbindBTService();
 	}
 
-	/**
-	 * AccessibilityServiceの接続時処理
-	 */
 	@Override
-	protected void onServiceConnected() {
-		super.onServiceConnected();
-		// 自分自身のインスタンスを保持
-		sSharedInstance = this;
+	public void onDestroy() {
+		super.onDestroy();
+		UnbindBTService();
 	}
 
 	/**
-	 * AccessibilityServiceのバインド解除時処理
-	 * @param intent
-	 * @return
+	 * BTServiceにバインドする
 	 */
-	@Override
-	public boolean onUnbind(Intent intent) {
-		sSharedInstance = null;
-		return super.onUnbind(intent);
-	}
-
-	/**
-	 * Binderを取得する
-	 * @return
-	 */
-	public static IBinder GetBinder(){
-		if(sSharedInstance == null){
-			return null;
+	private void BindBTService(){
+		if(!mIsBound) {
+			// Serviceと接続
+			Intent intent = new Intent(this, BTService.class);
+			bindService(intent, mConnection, BIND_AUTO_CREATE);
+			Log.d("onAccessibilityEvent", "bind BTService");
 		}
-		return sSharedInstance.mBinder;
 	}
+
+	/**
+	 * BTServiceのバインド解除
+	 */
+	private void UnbindBTService(){
+		if(mIsBound) {
+			unbindService(mConnection);
+			Log.d("onAccessibilityEvent", "unbind BTService");
+		}
+		mIsBound = false;
+	}
+
+	/**
+	 * Serviceと接続するためのコネクション
+	 */
+	private ServiceConnection mConnection = new ServiceConnection() {
+
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			mBoundBTService = null;
+			mIsBound = false;
+		}
+
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			mBoundBTService = ((BTService.BTServicelBinder)service).getService();
+			mIsBound = true;
+			Log.d("onAccessibilityEvent", "BTService Connected");
+		}
+	};
 
 	/**
 	 * Notification情報を送信する
 	 * @param notifyInfo
 	 */
 	public void SendNotification(NotificationInfo notifyInfo) {
-		// 再描画を通知する
-		int n = mCallbackList.beginBroadcast();
-		for (int i = 0; i < n; i++) {
-			try {
-				mCallbackList.getBroadcastItem(i).SendNotification(notifyInfo.GetJsonStr(notifyInfo));
-			} catch (RemoteException e) {
-			}
+		if(mBoundBTService == null){
+			Log.d("onAccessibilityEvent", "mBoundService is null");
+			return;
 		}
-		mCallbackList.finishBroadcast();
+		mBoundBTService.SendNotification(notifyInfo.GetJsonStr(notifyInfo));
 	}
-
-	/**
-	 * クライアントからの要求処理
-	 */
-	private IBTAccessibilityService.Stub mBinder = new IBTAccessibilityService.Stub() {
-		@Override
-		public void registerCallback(IBTAccessibilityServiceCallback callback)
-				throws RemoteException {
-			mCallbackList.register(callback);
-		}
-
-		@Override
-		public void unregisterCallback(IBTAccessibilityServiceCallback callback)
-				throws RemoteException {
-			mCallbackList.unregister(callback);
-		}
-	};
 }

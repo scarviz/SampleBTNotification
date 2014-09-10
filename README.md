@@ -26,3 +26,10 @@ ServiceのスイッチをONにする(デフォルトでONになっている)
 #### Notificationの通知テスト
 1. 端末のTestボタンを押下する
 2. AndroidWearにNotificationが表示されていれば成功
+
+--------
+#### 停止
+1. 端末のSampleBTNotification画面からServiceのスイッチをOFFにする
+2. AccessibilityServiceボタンを押下し、ユーザ補助画面のSampleBTNotificationの項目を無効にする
+3. 通知エリアに常駐していたSampleBTNotificationの通知が消えていることを確認する
+4. AndroidWearの画面からServiceのスイッチをOFFにする

@@ -5,6 +5,9 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
+	<uses-permission android:name="android.permission.RECEIVE_SMS"/>
+	<uses-permission android:name="android.permission.READ_CONTACTS"/>
+	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:allowBackup="true"
@@ -37,6 +40,13 @@
             android:enabled="true"
             android:exported="false" >
         </service>
+
+        <receiver
+            android:name=".SMSReceiver" >
+			<intent-filter>
+				<action android:name="android.provider.Telephony.SMS_RECEIVED"/>
+			</intent-filter>
+        </receiver>
     </application>
 
 </manifest>

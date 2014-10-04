@@ -3,6 +3,7 @@ package com.scarviz.samplebtnotification;
 import android.accessibilityservice.AccessibilityService;
 import android.app.Notification;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ApplicationInfo;
@@ -10,6 +11,8 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.IBinder;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
@@ -26,6 +29,20 @@ public class BTAccessibilityService extends AccessibilityService
 
 	/** GooglePlayストアのパッケージ名 */
 	private final String GPS_PKG_NM = "com.android.vending";
+
+	TelephonyManager telephonyManager;
+
+	@Override
+	protected void onServiceConnected() {
+		super.onServiceConnected();
+
+		Log.d("onServiceConnected", "Connected BTAccessibilityService");
+		// BTServiceをバインドする
+		BindBTService();
+		// 着信イベントのリスナー登録
+		telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+		telephonyManager.listen(mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+	}
 
 	@Override
 	public void onAccessibilityEvent(AccessibilityEvent event) {
@@ -71,8 +88,6 @@ public class BTAccessibilityService extends AccessibilityService
 		if(!existPkg){
 			return;
 		}
-
-		BindBTService();
 
 		Notification n = (Notification)event.getParcelableData();
 		if (n == null) {
@@ -200,4 +215,26 @@ public class BTAccessibilityService extends AccessibilityService
 		}
 		mBoundBTService.SendNotification(notifyInfo.GetJsonStr(notifyInfo));
 	}
+
+	/**
+	 * 着信イベントのリスナー
+	 */
+	PhoneStateListener mPhoneStateListener = new PhoneStateListener() {
+		@Override
+		public void onCallStateChanged(int state, String number) {
+			switch (state) {
+				// 着信
+				case TelephonyManager.CALL_STATE_RINGING:
+					Drawable icon =  getResources().getDrawable(R.drawable.ic_launcher);
+
+					NotificationInfo notifyInfo = new NotificationInfo();
+					notifyInfo.Title = "着信";
+					notifyInfo.Text = ComFunc.GetCallerName(BTAccessibilityService.this, number);
+					notifyInfo.Icon = ((BitmapDrawable) icon).getBitmap();
+					notifyInfo.GroupName = "TelephonyManager.CALL_STATE_RINGING";
+					SendNotification(notifyInfo);
+					break;
+			}
+		}
+	};
 }

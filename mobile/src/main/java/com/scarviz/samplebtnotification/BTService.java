@@ -19,6 +19,10 @@ public class BTService extends Service {
 	private BluetoothHelper mBtHelper;
 	private final String UUID = "9dfda1d0-dc92-477b-b109-b731ecce2c21";
 
+	public static final String REQUEST_TYPE = "REQUEST_TYPE";
+	public static final int REQUEST_TYPE_ID = 1000;
+	public static final String NOTIFY_INFO_JSON = "NOTIFY_INFO_JSON";
+
 	@Override
 	public void onCreate() {
 		Log.d("BTService","onCreate");
@@ -33,6 +37,14 @@ public class BTService extends Service {
 		}
 		if(mBtHelper == null) {
 			mBtHelper = new BluetoothHelper(this, UUID, mBtProcHandler);
+		}
+
+		// Intentに格納されているものがあった場合
+		if (intent != null && intent.getIntExtra(REQUEST_TYPE, 0) == REQUEST_TYPE_ID) {
+			// NotificationInfoのJSONを取得する
+			String notifyInfoJson = intent.getStringExtra(NOTIFY_INFO_JSON);
+			// Notificationを送る
+			SendNotification(notifyInfoJson);
 		}
 
 		return START_STICKY;

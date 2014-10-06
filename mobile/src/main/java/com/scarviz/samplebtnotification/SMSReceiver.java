@@ -45,7 +45,14 @@ public class SMSReceiver extends BroadcastReceiver {
 		for(int i=0; i<pdus.length; i++){
 			SmsMessage msg = SmsMessage.createFromPdu((byte[])pdus[i]);
 
-			sb.append(ComFunc.GetCallerName(context, msg.getOriginatingAddress()));
+			String callerNo = msg.getOriginatingAddress();
+			// auニュースEXなどの速報サービスで既に利用されていないが垂れ流されているようなので無視させる
+			if(callerNo != null
+				&& (callerNo.equals("9701060") || callerNo.equals("9711060"))) {
+				continue;
+			}
+
+			sb.append(ComFunc.GetCallerName(context, callerNo));
 			sb.append("\n");
 			sb.append("Message:");
 			sb.append("\n");

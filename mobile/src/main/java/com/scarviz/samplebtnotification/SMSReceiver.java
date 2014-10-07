@@ -46,9 +46,11 @@ public class SMSReceiver extends BroadcastReceiver {
 			SmsMessage msg = SmsMessage.createFromPdu((byte[])pdus[i]);
 
 			String callerNo = msg.getOriginatingAddress();
+			String mesBody = msg.getMessageBody();
 			// auニュースEXなどの速報サービスで既に利用されていないが垂れ流されているようなので無視させる
-			if(callerNo != null
-				&& (callerNo.equals("9701060") || callerNo.equals("9711060"))) {
+			// ※メッセージの先頭に番号が記載されているので、とりあえず最初の文字列を見るようにしておく
+			if(mesBody != null
+				&& (mesBody.startsWith("9701060") || mesBody.startsWith("9711060"))) {
 				continue;
 			}
 
@@ -56,7 +58,7 @@ public class SMSReceiver extends BroadcastReceiver {
 			sb.append("\n");
 			sb.append("Message:");
 			sb.append("\n");
-			sb.append(msg.getMessageBody());
+			sb.append(mesBody);
 
 			Drawable icon =  context.getResources().getDrawable(R.drawable.ic_launcher);
 

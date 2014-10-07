@@ -7,4 +7,7 @@
 	<string name="txt_vibrator_sw">Vibrator</string>
 
 	<string name="txt_test">Test</string>
+
+	<string name="mes_title_dis_connected">Forgetting something?</string>
+	<string name="mes_text_dis_connected">You may have left your phone behind.</string>
 </resources>

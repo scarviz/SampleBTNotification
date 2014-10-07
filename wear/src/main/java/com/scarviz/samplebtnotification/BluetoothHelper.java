@@ -8,6 +8,8 @@ import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
@@ -173,6 +175,31 @@ public class BluetoothHelper {
 	}
 
 	/**
+	 * 接続フラグを設定する
+	 * @param isConnected
+	 */
+	private void SetIsConnected(boolean isConnected){
+		boolean befmIsConnected = mIsConnected;
+		mIsConnected = isConnected;
+
+		// 接続状態から切断状態に変更された場合
+		if(!isConnected && befmIsConnected
+				&& mContext != null && mHandler != null) {
+			Drawable icon =  mContext.getResources().getDrawable(R.drawable.ic_launcher);
+			NotificationInfo notifyInfo = new NotificationInfo();
+			notifyInfo.Title = mContext.getString(R.string.mes_title_dis_connected);
+			notifyInfo.Text = mContext.getString(R.string.mes_text_dis_connected);
+			notifyInfo.Icon =  ((BitmapDrawable) icon).getBitmap();
+			notifyInfo.GroupName = this.getClass().getPackage().toString();
+
+			Message mes = Message.obtain();
+			mes.what = RES_HANDL_ID;
+			mes.obj = notifyInfo.GetJsonStr(notifyInfo);
+			mHandler.sendMessage(mes);
+		}
+	}
+
+	/**
 	 * クライアント側の処理スレッド
 	 */
 	private class ClientThread extends ReceiverThread  {
@@ -194,7 +221,7 @@ public class BluetoothHelper {
 			try {
 				// サーバに接続する
 				mSocket.connect();
-				mIsConnected = true;
+				SetIsConnected(true);
 				loop();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -207,6 +234,7 @@ public class BluetoothHelper {
 		private void cancel() {
 			try {
 				mSocket.close();
+				SetIsConnected(false);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -233,7 +261,7 @@ public class BluetoothHelper {
 				Log.d("ServerThread", "accepting...");
 				mSocket = mServerSocket.accept();
 				Log.d("ServerThread", "accepted");
-				mIsConnected = true;
+				SetIsConnected(true);
 				loop();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -245,6 +273,7 @@ public class BluetoothHelper {
 		private void cancel() {
 			try {
 				mServerSocket.close();
+				SetIsConnected(false);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

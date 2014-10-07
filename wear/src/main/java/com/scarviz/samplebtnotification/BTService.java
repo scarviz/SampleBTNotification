@@ -142,8 +142,7 @@ public class BTService extends Service {
 
 			switch (msg.what) {
 				case BluetoothHelper.RES_HANDL_ID:
-					String message = (String)msg.obj;
-					btSrv.SetNotify(message);
+					btSrv.SetNotify((String)msg.obj);
 					break;
 				default:
 					super.handleMessage(msg);

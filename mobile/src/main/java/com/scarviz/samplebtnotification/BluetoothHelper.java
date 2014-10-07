@@ -207,6 +207,7 @@ public class BluetoothHelper {
 		private void cancel() {
 			try {
 				mSocket.close();
+				mIsConnected = false;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -245,6 +246,7 @@ public class BluetoothHelper {
 		private void cancel() {
 			try {
 				mServerSocket.close();
+				mIsConnected = false;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
